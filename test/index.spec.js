@@ -164,3 +164,88 @@ describe("API de produtos e categorias", () => {
     expect(data.categories.length).toBeGreaterThan(0);
   });
 });
+
+describe("API de favoritos", () => {
+  async function criarCliente() {
+    const response = await SELF.fetch("http://example.com/clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Itamar",
+        email: "itamar@teste.com",
+        password: "senha12345"
+      })
+    });
+
+    const data = await response.json();
+    return data.client.id;
+  }
+
+  it("deve adicionar um produto aos favoritos", async () => {
+    const id = await criarCliente();
+
+    const response = await SELF.fetch(
+      `http://example.com/clients/${id}/favorites`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id: 1 })
+      }
+    );
+
+    expect(response.status).toBe(201);
+  });
+
+  it("deve listar os favoritos do cliente", async () => {
+    const id = await criarCliente();
+
+    await SELF.fetch(`http://example.com/clients/${id}/favorites`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: 1 })
+    });
+
+    const response = await SELF.fetch(
+      `http://example.com/clients/${id}/favorites`
+    );
+
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(data.favorites)).toBe(true);
+    expect(data.favorites.length).toBe(1);
+  });
+
+  it("não deve permitir produtos favoritos duplicados", async () => {
+    const id = await criarCliente();
+
+    const url = `http://example.com/clients/${id}/favorites`;
+    const options = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: 1 })
+    };
+
+    await SELF.fetch(url, options);
+    const response = await SELF.fetch(url, options);
+
+    expect(response.status).toBe(409);
+  });
+
+  it("deve remover um produto dos favoritos", async () => {
+    const id = await criarCliente();
+
+    await SELF.fetch(`http://example.com/clients/${id}/favorites`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: 1 })
+    });
+
+    const response = await SELF.fetch(
+      `http://example.com/clients/${id}/favorites/1`,
+      { method: "DELETE" }
+    );
+
+    expect(response.status).toBe(200);
+  });
+});
