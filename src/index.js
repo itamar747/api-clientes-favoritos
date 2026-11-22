@@ -1,3 +1,4 @@
+
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
     status,
@@ -131,7 +132,17 @@ export default {
             "SELECT id FROM clients WHERE id = ?"
           ).bind(id).first();
 
-          if (!existing) return json({ error: "Cliente não encontrado." }, 404);
+          if (!existing) {
+            return json({ error: "Cliente não encontrado." }, 404);
+          }
+
+          const emailExists = await db.prepare(
+            "SELECT id FROM clients WHERE email = ? AND id != ?"
+          ).bind(email.trim().toLowerCase(), id).first();
+
+          if (emailExists) {
+            return json({ error: "Este e-mail já está cadastrado." }, 409);
+          }
 
           if (password !== undefined) {
             if (typeof password !== "string" || password.length < 8) {
@@ -180,8 +191,24 @@ export default {
         if (response.status === 404) {
           return json({ error: "Produto não encontrado." }, 404);
         }
-        if (!response.ok) return json({ error: "Falha ao buscar produto." }, 502);
-        return json({ product: await response.json() });
+
+        if (!response.ok) {
+          return json({ error: "Falha ao buscar produto." }, 502);
+        }
+
+         let product;
+
+try {
+  product = await response.json();
+} catch {
+  return json({ error: "Produto não encontrado." }, 404);
+}
+
+if (!product || !product.id) {
+  return json({ error: "Produto não encontrado." }, 404);
+}
+
+return json({ product });
       }
 
       // LISTAR CATEGORIAS
