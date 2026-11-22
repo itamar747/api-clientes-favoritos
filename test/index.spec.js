@@ -86,3 +86,61 @@ describe("API de clientes", () => {
     expect(data.clients[0].name).toBe("Itamar");
   });
 });
+
+describe("Atualização e exclusão de clientes", () => {
+  it("deve atualizar os dados de um cliente", async () => {
+    const cadastro = await SELF.fetch("http://example.com/clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Itamar",
+        email: "itamar@teste.com",
+        password: "senha12345"
+      })
+    });
+
+    const clienteCriado = await cadastro.json();
+    const id = clienteCriado.client.id;
+
+    const response = await SELF.fetch(`http://example.com/clients/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Itamar Teixeira",
+        email: "itamar@teste.com"
+      })
+    });
+
+    expect(response.status).toBe(200);
+
+    const consulta = await SELF.fetch(`http://example.com/clients/${id}`);
+    const data = await consulta.json();
+
+    expect(data.client.name).toBe("Itamar Teixeira");
+  });
+
+  it("deve excluir um cliente", async () => {
+    const cadastro = await SELF.fetch("http://example.com/clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Cliente para excluir",
+        email: "excluir@teste.com",
+        password: "senha12345"
+      })
+    });
+
+    const clienteCriado = await cadastro.json();
+    const id = clienteCriado.client.id;
+
+    const response = await SELF.fetch(`http://example.com/clients/${id}`, {
+      method: "DELETE"
+    });
+
+    expect(response.status).toBe(200);
+
+    const consulta = await SELF.fetch(`http://example.com/clients/${id}`);
+
+    expect(consulta.status).toBe(404);
+  });
+});
