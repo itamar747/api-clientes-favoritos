@@ -129,7 +129,7 @@ A tabela favorites possui relacionamento com clients e impede que o mesmo produt
 ### 1. Clonar o repositório
 
 ```bash
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/itamar747/api-clientes-favoritos.git
 ```
 
 ### 2. Entrar na pasta
