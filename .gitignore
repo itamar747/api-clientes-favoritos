@@ -165,3 +165,9 @@ dist
 .env*
 !.env.example
 .wrangler/
+
+# Configurações locais do VS Code
+.vscode/
+
+# Arquivos de tipos gerados pelo Cloudflare
+worker-configuration.d.ts

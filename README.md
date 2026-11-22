@@ -1,34 +1,66 @@
 # API de Clientes e Produtos Favoritos
 
-API REST desenvolvida com **JavaScript, Cloudflare Workers e Cloudflare D1**, integrada à Fake Store API.
+Projeto full-stack desenvolvido com JavaScript, Cloudflare Workers, Cloudflare D1 e React. A aplicação permite gerenciar clientes, consultar produtos e administrar produtos favoritos.
 
-## Endereço público
+## Demonstração
+
+**API publicada:**
 
 https://api-clientes-favoritos.itamarteixeirasousa747.workers.dev
 
+**Repositório GitHub:**
+
+https://github.com/itamar747/api-clientes-favoritos
+
 ## Tecnologias utilizadas
 
+### Backend
 - JavaScript
 - Cloudflare Workers
 - Cloudflare D1 (SQLite)
 - Wrangler
-- Fake Store API
 - Vitest
+- Fake Store API
+
+### Frontend
+- React
+- Vite
+- JavaScript
+- CSS
+- Lucide React
 
 ## Funcionalidades
 
-- Cadastro, consulta, atualização e exclusão de clientes.
-- Senhas armazenadas com hash PBKDF2 e salt aleatório.
-- Consulta de produtos pela Fake Store API.
-- Consulta de produtos por ID.
-- Listagem de categorias.
-- Adição, consulta e remoção de produtos favoritos.
-- Armazenamento dos favoritos no banco D1.
-- Validação de dados e respostas HTTP.
+### Clientes
+- Cadastrar clientes.
+- Listar clientes.
+- Consultar cliente por ID.
+- Atualizar dados dos clientes.
+- Excluir clientes.
+- Validar dados e impedir e-mails duplicados.
+- Armazenar senhas com hash PBKDF2 e salt aleatório.
 
-## Endpoints
+### Produtos
+- Listar produtos da Fake Store API.
+- Consultar produtos por ID.
+- Listar categorias.
 
-Base URL:
+### Favoritos
+- Adicionar produtos aos favoritos.
+- Consultar favoritos de cada cliente.
+- Remover produtos favoritos.
+- Impedir favoritos duplicados.
+
+### Painel administrativo
+- Dashboard com resumo das informações.
+- Gerenciamento de clientes.
+- Visualização de produtos.
+- Gerenciamento de favoritos.
+- Integração com a API publicada.
+
+## Endpoints da API
+
+**Base URL:**
 
 `https://api-clientes-favoritos.itamarteixeirasousa747.workers.dev`
 
@@ -42,22 +74,22 @@ Base URL:
 | PUT | `/clients/:id` | Atualizar cliente |
 | DELETE | `/clients/:id` | Excluir cliente |
 
-### Produtos
+### Produtos e categorias
 
 | Método | Endpoint | Descrição |
 |---|---|---|
 | GET | `/products` | Listar produtos |
-| GET | `/products/:id` | Buscar produto por ID |
+| GET | `/products/:id` | Buscar produto |
 | GET | `/categories` | Listar categorias |
 
-Os produtos são consultados diretamente na Fake Store API: https://fakestoreapi.com
+Os produtos são obtidos através da [Fake Store API](https://fakestoreapi.com).
 
 ### Favoritos
 
 | Método | Endpoint | Descrição |
 |---|---|---|
 | POST | `/clients/:id/favorites` | Adicionar favorito |
-| GET | `/clients/:id/favorites` | Listar favoritos do cliente |
+| GET | `/clients/:id/favorites` | Listar favoritos |
 | DELETE | `/clients/:id/favorites/:productId` | Remover favorito |
 
 ## Exemplos de requisições
@@ -87,7 +119,7 @@ A senha deve possuir pelo menos 8 caracteres.
 }
 ```
 
-### Adicionar produto aos favoritos
+### Adicionar favorito
 
 `POST /clients/1/favorites`
 
@@ -107,7 +139,7 @@ A senha deve possuir pelo menos 8 caracteres.
 
 ## Banco de dados
 
-O projeto utiliza Cloudflare D1 com duas tabelas:
+O projeto utiliza Cloudflare D1, com as tabelas:
 
 **clients**
 - id
@@ -122,9 +154,9 @@ O projeto utiliza Cloudflare D1 com duas tabelas:
 - product_id
 - created_at
 
-A tabela favorites possui relacionamento com clients e impede que o mesmo produto seja adicionado duas vezes aos favoritos do mesmo cliente.
+A tabela de favoritos possui relacionamento com clientes e impede a duplicação de produtos favoritos para o mesmo cliente.
 
-## Como executar localmente
+## Como executar o projeto
 
 ### 1. Clonar o repositório
 
@@ -138,54 +170,76 @@ git clone https://github.com/itamar747/api-clientes-favoritos.git
 cd api-clientes-favoritos
 ```
 
-### 3. Instalar dependências
+### 3. Instalar as dependências do backend
 
 ```bash
 npm install
 ```
 
-### 4. Executar a API
-
-```bash
-npm run dev
-```
-
-A API ficará disponível localmente em:
-
-`http://localhost:8787`
-
-## Migrações do banco de dados
-
-Aplicar as migrações no banco local:
+### 4. Aplicar as migrações locais do banco
 
 ```bash
 npx wrangler d1 migrations apply api-clientes-favoritos-db --local
 ```
 
-Aplicar as migrações no banco remoto:
+### 5. Iniciar o backend
 
 ```bash
-npx wrangler d1 migrations apply api-clientes-favoritos-db --remote
+npm run dev
 ```
+
+A API local ficará disponível em:
+
+`http://localhost:8787`
+
+### 6. Instalar as dependências do frontend
+
+Abra outro terminal:
+
+```bash
+cd frontend
+npm install
+```
+
+### 7. Iniciar o frontend
+
+```bash
+npm run dev
+```
+
+O Vite exibirá o endereço local do painel, normalmente:
+
+`http://localhost:5173`
+
+O frontend está configurado para consumir a API publicada na Cloudflare.
+
+## Testes automatizados
+
+Para executar os testes do backend:
+
+```bash
+npm test -- --run
+```
+
+**Resultado da última execução:**
+- 12 testes aprovados.
+- 0 testes com falha.
+- Clientes, produtos, categorias e favoritos testados.
 
 ## Publicação
 
-Para publicar a API na Cloudflare Workers:
+Para publicar ou atualizar a API na Cloudflare Workers:
 
 ```bash
 npm run deploy
 ```
 
-## Testes
-
-Para executar os testes automatizados:
+Para aplicar migrações no banco remoto:
 
 ```bash
-npm test
+npx wrangler d1 migrations apply api-clientes-favoritos-db --remote
 ```
-
-As rotas também podem ser testadas com Postman ou cURL.
 
 ## Autor
 
-Projeto acadêmico desenvolvido para estudo de desenvolvimento de APIs REST, integração com serviços externos e banco de dados.
+Projeto acadêmico desenvolvido para estudo de desenvolvimento de APIs REST, banco de dados, integração com serviços externos e desenvolvimento frontend com React.
