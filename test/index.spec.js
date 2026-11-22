@@ -144,3 +144,23 @@ describe("Atualização e exclusão de clientes", () => {
     expect(consulta.status).toBe(404);
   });
 });
+
+describe("API de produtos e categorias", () => {
+  it("deve listar os produtos da Fake Store API", async () => {
+    const response = await SELF.fetch("http://example.com/products");
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(data.products)).toBe(true);
+    expect(data.products.length).toBeGreaterThan(0);
+  });
+
+  it("deve listar as categorias dos produtos", async () => {
+    const response = await SELF.fetch("http://example.com/categories");
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(data.categories)).toBe(true);
+    expect(data.categories.length).toBeGreaterThan(0);
+  });
+});
